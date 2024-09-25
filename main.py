@@ -1,9 +1,6 @@
 from fastapi import FastAPI
-
 import json
-
 from modules import Snowboard, Brands
-
 
 app = FastAPI()
 
@@ -24,8 +21,19 @@ async def post_board(board: Snowboard):
 
 @app.put("/snowboarding/{id}")
 async def put_board(id: int, board: Snowboard):
-    snowboard_list[id-1] = board
+    for idx, item in enumerate(snowboard_list):
+        if item['id'] == id:
+            snowboard_list[idx] = board.model_dump()
+            return {"message": "Snowboard updated successfully"}
+
+    snowboard_list.append(board.model_dump())
+    return {"message": "Snowboard created successfully"}
 
 @app.delete("/snowboarding/{id}")
 async def delete_board(id: int):
-    snowboard_list.pop(id-1)
+    for idx, item in enumerate(snowboard_list):
+        if item['id'] == id:
+            snowboard_list.pop(idx)
+            return {"message": "Snowboard deleted successfully"}
+
+    return {"error": "Snowboard not found"}
